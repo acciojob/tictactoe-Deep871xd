@@ -1,82 +1,48 @@
-document.getElementById("submit").addEventListener("click", function () {
-  var player1 = document.getElementById("player-1").value;
-  var player2 = document.getElementById("player-2").value;
+//your JS code here. If required.
+// Get player names and submit button
+const player1Input = document.getElementById('player-1');
+const player2Input = document.getElementById('player-2');
+const submitButton = document.getElementById('submit');
 
-  if (player1 !== "" && player2 !== "") {
-    document.getElementById("player-input").style.display = "none";
-    document.getElementById("game").style.display = "block";
+// Get game board and message div
+const board = document.getElementById('board');
+const messageDiv = document.getElementById('message');
 
-    var currentPlayer = player1;
-    var cells = document.getElementsByClassName("cell");
+// Player names and current turn
+let player1Name = '';
+let player2Name = '';
+let currentPlayer = '';
 
-    for (var i = 0; i < cells.length; i++) {
-      cells[i].addEventListener("click", cellClick);
-    }
+// Add event listener to submit button
+submitButton.addEventListener('click', startGame);
 
-    setMessage(currentPlayer + ", you're up!");
+// Function to start the game
+function startGame() {
+  // Get player names from input fields
+  player1Name = player1Input.value;
+  player2Name = player2Input.value;
 
-    function cellClick() {
-      if (this.innerHTML === "") {
-        this.innerHTML = currentPlayer === player1 ? "X" : "O";
-        this.removeEventListener("click", cellClick);
+  // Set current player
+  currentPlayer = player1Name;
 
-        if (checkWin()) {
-          setMessage(currentPlayer + ", congratulations, you won!");
-          removeCellClickListeners();
-        } else if (checkDraw()) {
-          setMessage("It's a draw!");
-          removeCellClickListeners();
-        } else {
-          currentPlayer = currentPlayer === player1 ? player2 : player1;
-          setMessage(currentPlayer + ", you're up!");
-        }
-      }
-    }
+  // Display whose turn is it
+  displayMessage(`${currentPlayer}, you're up!`);
 
-    function setMessage(message) {
-      document.querySelector(".message").innerHTML = message;
-    }
+  // Remove player input fields and submit button
+  player1Input.style.display = 'none';
+  player2Input.style.display = 'none';
+  submitButton.style.display = 'none';
 
-    function checkWin() {
-      var winConditions = [
-        [1, 2, 3],
-        [4, 5, 6],
-        [7, 8, 9],
-        [1, 4, 7],
-        [2, 5, 8],
-        [3, 6, 9],
-        [1, 5, 9],
-        [3, 5, 7]
-      ];
+  // Add event listeners to board cells
+  const cells = Array.from(document.getElementsByClassName('cell'));
+  cells.forEach(cell => cell.addEventListener('click', cellClick));
+}
 
-      for (var i = 0; i < winConditions.length; i++) {
-        var [a, b, c] = winConditions[i];
-        if (
-          cells[a - 1].innerHTML !== "" &&
-          cells[a - 1].innerHTML === cells[b - 1].innerHTML &&
-          cells[a - 1].innerHTML === cells[c - 1].innerHTML
-        ) {
-          return true;
-        }
-      }
+// Function to handle cell click event
+function cellClick(event) {
+  const cell = event.target;
 
-      return false;
-    }
-
-    function checkDraw() {
-      for (var i = 0; i < cells.length; i++) {
-        if (cells[i].innerHTML === "") {
-          return false;
-        }
-      }
-
-      return true;
-    }
-
-    function removeCellClickListeners() {
-      for (var i = 0; i < cells.length; i++) {
-        cells[i].removeEventListener("click", cellClick);
-      }
-    }
-  }
-});
+  // Check if the cell is empty
+  if (!cell.innerHTML) {
+    // Set cell content to current player's symbol (X or O)
+    cell.innerHTML = currentPlayer === player
